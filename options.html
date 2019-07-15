@@ -1,0 +1,69 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Everything Metric - Options</title>
+  <style>
+      *: { margin: 5px; }
+    body: { padding: 10px; font-size: 2em;  }
+  </style>
+</head>
+
+<body>
+ 
+    <p>Developer <strong>Milos Paripovic</strong> (<a href="https://twitter.com/milosparipovic">Twitter: @milosparipovic </a>)</p>
+    
+    <p>If this add-on doesn't work correctly on a certain page, please send me an <strong>email</strong> with the link (<a href="mailto:metric@milosparipovic.com">metric@milosparipovic.com</a>)</p>
+
+  <label>
+      <input type="checkbox" id="useComma">
+      <strong>Use Comma</strong> instead of Dot for decimals <br />(1.5 m > 1,5 m)<br />
+    </label>
+    <br/>
+      
+   <label>
+      <input type="checkbox" id="useSpaces">
+      Use <strong>Space for thousand </strong> separator <br />(1.234,5 m > 1 234,5 m)<br />
+    </label>
+    <br/>
+    <p><strong>Notes </strong>(from Wikipedia):</p>
+    <p><strong>1 234.56 is SI style (English version)</strong>, used in Australia, Canada (English-speaking), China, Sri Lanka, Switzerland (officially encouraged for currency numbers only <br/>
+    <strong>1 234,56 is SI style (French version)</strong>, used in Albania, Belgium (French), Bulgaria, Canada (French-speaking), Czech Republic, Estonia, Finland, France, Hungary, Latin Europe, Latvia, Lithuania, Norway, Peru, Poland, Portugal, Russia, Slovakia, South Africa, Sweden, Switzerland, Ukraine, Vietnam.
+    <br/>
+    <strong>1.234,56</strong> is not official SI style but it is widely used in Argentina, Austria, Belgium (Dutch), Bosnia and Herzegovina, Brazil, Chile, Colombia, Costa Rica, Croatia, Denmark, Germany, Greece, Indonesia, Italy, Netherlands, Romania, Serbia, Slovenia, Spain, Turkey, Vietnam. <br/>
+    <strong>1,234.56</strong> is not official SI style but it is widely used Canada (English-speaking; unofficial), China, Hong Kong, Ireland, Israel, Japan, Korea, Malaysia, México, New Zealand, Pakistan, Philippines, Singapore, Taiwan, Thailand, United Kingdom, United States. </p>
+ 
+<label>   
+    <input type="checkbox" id="useMM">
+    Prefer <strong>mm and g</strong> instead of <strong>cm and kg</strong> <br />(29.7 cm > 297 mm)<br /> 
+  </label>
+<br/>
+    
+     <label>
+    <input type="checkbox" id="useGiga">
+    Use <strong>Mega and Giga</strong> for large units <br />(2000 km > 2 Mm) <br />
+  </label>
+<br/>
+    
+  <label>
+    <input type="checkbox" id="useRounding">
+    <strong>Round numbers</strong> if less than 3% of error <br />(55.11 cm > 55 cm)<br />
+  </label>
+    <br/>
+    <label>
+    <input type="checkbox" id="useMO">
+    Continue running after 1st pass <br />(if page changes, apply to new content also)*<br />
+  </label>
+    
+  <br/>
+      <button id="save" style="margin-top: 10px; margin-bottom: 10px; width: 100px; text-align: center;">Save</button>
+    <p>Refresh pages to see changes</p>
+
+ <p>* The last option can make browsing <strong>slower</strong> and it may trigger changes while typing text</p>
+  <div id="status" style="color:seagreen"></div>
+  
+  
+ 
+  <script src="options.js"></script>
+</body>
+</html>
