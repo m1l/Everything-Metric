@@ -11,4 +11,4 @@ https://chrome.google.com/webstore/detail/everything-metric-auto-un/hknjpaididhf
 Starting code based on https://github.com/esprimo/imperial-to-metric-chrome-extension
 
 You can test conversion in action at
-<a href="https://www.linkedin.com/pulse/everything-metric-chrome-firefox-milos-paripovic/" />
+https://www.linkedin.com/pulse/everything-metric-chrome-firefox-milos-paripovic/
