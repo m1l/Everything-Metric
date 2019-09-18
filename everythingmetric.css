@@ -1,0 +1,41 @@
+#EverythingMetricExtension {
+  visibility: hidden;
+  min-width: 150px;
+  margin-left: -75px;
+  background-color: #333;
+  color: #fff;
+  text-align: center;
+  border-radius: 2px;
+  padding: 8px;
+  position: fixed;
+  z-index: 1;
+  left: 50%;
+  bottom: 15px;
+  font-size: 12px;
+}
+
+#EverythingMetricExtension.show {
+  visibility: visible;
+  -webkit-animation: emfadein 0.5s, emfadeout 0.5s 2.5s;
+  animation: fadeinx 0.5s, emfadeout 0.5s 2.5s;
+}
+
+@-webkit-keyframes emfadein {
+  from {bottom: 0; opacity: 0;} 
+  to {bottom: 30px; opacity: 1;}
+}
+
+@keyframes emfadein {
+  from {bottom: 0; opacity: 0;}
+  to {bottom: 30px; opacity: 1;}
+}
+
+@-webkit-keyframes emfadeout {
+  from {bottom: 30px; opacity: 1;} 
+  to {bottom: 0; opacity: 0;}
+}
+
+@keyframes emfadeout {
+  from {bottom: 30px; opacity: 1;}
+  to {bottom: 0; opacity: 0;}
+}

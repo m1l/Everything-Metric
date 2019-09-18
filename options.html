@@ -1,69 +1,118 @@
 
+
 <!DOCTYPE html>
 <html>
-<head>
-  <title>Everything Metric - Options</title>
-  <style>
-      *: { margin: 5px; }
-    body: { padding: 10px; font-size: 2em;  }
-  </style>
-</head>
-
-<body>
- 
-    <p>Developer <strong>Milos Paripovic</strong> (<a href="https://twitter.com/milosparipovic">Twitter: @milosparipovic </a>)</p>
-    
-    <p>If this add-on doesn't work correctly on a certain page, please send me an <strong>email</strong> with the link (<a href="mailto:metric@milosparipovic.com">metric@milosparipovic.com</a>)</p>
-
-  <label>
-      <input type="checkbox" id="useComma">
-      <strong>Use Comma</strong> instead of Dot for decimals <br />(1.5 m > 1,5 m)<br />
-    </label>
-    <br/>
-      
-   <label>
-      <input type="checkbox" id="useSpaces">
-      Use <strong>Space for thousand </strong> separator <br />(1.234,5 m > 1 234,5 m)<br />
-    </label>
-    <br/>
-    <p><strong>Notes </strong>(from Wikipedia):</p>
-    <p><strong>1 234.56 is SI style (English version)</strong>, used in Australia, Canada (English-speaking), China, Sri Lanka, Switzerland (officially encouraged for currency numbers only <br/>
-    <strong>1 234,56 is SI style (French version)</strong>, used in Albania, Belgium (French), Bulgaria, Canada (French-speaking), Czech Republic, Estonia, Finland, France, Hungary, Latin Europe, Latvia, Lithuania, Norway, Peru, Poland, Portugal, Russia, Slovakia, South Africa, Sweden, Switzerland, Ukraine, Vietnam.
-    <br/>
-    <strong>1.234,56</strong> is not official SI style but it is widely used in Argentina, Austria, Belgium (Dutch), Bosnia and Herzegovina, Brazil, Chile, Colombia, Costa Rica, Croatia, Denmark, Germany, Greece, Indonesia, Italy, Netherlands, Romania, Serbia, Slovenia, Spain, Turkey, Vietnam. <br/>
-    <strong>1,234.56</strong> is not official SI style but it is widely used Canada (English-speaking; unofficial), China, Hong Kong, Ireland, Israel, Japan, Korea, Malaysia, México, New Zealand, Pakistan, Philippines, Singapore, Taiwan, Thailand, United Kingdom, United States. </p>
- 
-<label>   
-    <input type="checkbox" id="useMM">
-    Prefer <strong>mm and g</strong> instead of <strong>cm and kg</strong> <br />(29.7 cm > 297 mm)<br /> 
-  </label>
-<br/>
-    
-     <label>
-    <input type="checkbox" id="useGiga">
-    Use <strong>Mega and Giga</strong> for large units <br />(2000 km > 2 Mm) <br />
-  </label>
-<br/>
-    
-  <label>
-    <input type="checkbox" id="useRounding">
-    <strong>Round numbers</strong> if less than 3% of error <br />(55.11 cm > 55 cm)<br />
-  </label>
-    <br/>
-    <label>
-    <input type="checkbox" id="useMO">
-    Continue running after 1st pass <br />(if page changes, apply to new content also)*<br />
-  </label>
-    
-  <br/>
-      <button id="save" style="margin-top: 10px; margin-bottom: 10px; width: 100px; text-align: center;">Save</button>
-    <p>Refresh pages to see changes</p>
-
- <p>* The last option can make browsing <strong>slower</strong> and it may trigger changes while typing text</p>
-  <div id="status" style="color:seagreen"></div>
-  
-  
- 
-  <script src="options.js"></script>
-</body>
+	<head>
+		<title>Everything Metric - Options</title>
+		<style>
+			* { margin: 0px; }
+			body { padding: 10px;  }
+			label {width: 100%; display: block; margin-top: 6px;}
+			.explanation {margin-left: 18px; margin-bottom: 3px;}
+            p {margin-bottom: 4px;}
+		</style>
+	</head>
+	<body>
+		<h2>Everything Metric</h2>
+		<h3>Extension settings</h3>
+		<p>Auto convert all sites to <strong>Metric / SI Units</strong> <br />
+		<p>Developer: <strong>Milos Paripovic</strong> (<a href="https://twitter.com/milosparipovic">Twitter: @milosparipovic </a>)</p>
+		<br />
+		
+		<label>   
+		<input type="checkbox" id="useBrackets">
+		Use more prominent <strong>brackets</strong>  
+		</label>
+		<div class="explanation">(5 m)&tilde; &#129138; &#12304;5 m&#12305;</div>
+        
+        <label>          
+		<input type="checkbox" id="useBold" >
+		Show converted numbers in <strong>Bold</strong> 
+		</label>
+		<div class="explanation">5 m &#129138; <strong>5 m</strong></div> 
+        <div class="explanation">Only works with &#12304; &#12305; brackets</div> 
+        <div class="explanation">Note: you will not be able to copy bold text (uses Unicode characters instead of regular numbers)</div>   
+        
+        <label>   
+		<input type="checkbox" id="matchIn">
+		Convert <strong># in</strong>
+		</label>
+		<div class="explanation">This can be annoying because "1960 in Germany" would be converted </div>
+        
+        <label>
+		<input type="checkbox" id="useComma">
+		<strong>Use Comma</strong> instead of Dot for decimals 
+		</label>
+		<div class="explanation">1.5 m &#129138; 1,5 m</div>
+        
+		<label>
+		<input type="checkbox" id="useSpaces">
+		Use <strong>Space for thousand </strong> separator 
+		</label>
+		<div class="explanation">1.234,5 m &#129138; 1 234,5 m</div>
+        
+		<label>   
+		<input type="checkbox" id="useKelvin">
+		Use <strong>Kelvin </strong> instead of <strong>Celsius</strong> 
+		</label>
+		<label> 
+        <div class="explanation"></div>
+		<input type="checkbox" id="useMM">
+		Prefer <strong>mm and g</strong> instead of <strong>cm and kg</strong>            
+		</label>
+		<div class="explanation">29.7 cm &#129138; 297 mm</div>
+		<label>
+		<input type="checkbox" id="useGiga">
+		Use <strong>Mega and Giga</strong> for large units
+		</label>
+		<div class="explanation">(2000 km &#129138; 2 Mm) </div>
+		<label>
+		<input type="checkbox" id="useRounding">
+		<strong>Round numbers</strong> if less than 3% of error 
+		</label>   
+		<div class="explanation">55.11 cm &#129138; 55 cm</div>
+        <label>
+		<input type="checkbox" id="convertBracketed">
+		Convert numbers in <strong>brackets</strong>
+		</label>   
+		<div class="explanation">Checking this can result in double conversion, if site already converts USCS: </div>
+        <div class="explanation">28 g (1 oz) &#129138; 28 g (1 oz &#12304;28 g&#12305;)</div>
+        <div class="explanation">but would fix 1 pack (1 oz) &#129138; 1 pack (1 oz &#12304;28 g&#12305;)</div>
+		<label>
+		<input type="checkbox" id="useMO">
+		<strong>Continuous conversion</strong>
+		</label>
+        <div class="explanation">For <strong>dynamic pages</strong>, that load additional content as you scroll (Enabled on Amazon by default)</div>
+        <div class="explanation">Note: this option can make browsing <strong>slower</strong> and it may trigger changes while you are typing text</div>
+        <div class="explanation">If you keep this option off, you can <strong>force conversion with Alt+M</strong></div>
+        <br />
+		<label style="display:none;">   
+		<input type="checkbox" id="useMetricOnly" disabled >
+		Future use - remove USCS / Imperial completely <br /><br /> 
+		</label>
+        <p>Refresh pages to see changes in settings</p>
+		<p><strong>Notes </strong>(from Wikipedia):</p>
+		<p><strong>1 234.56 is SI style (English version)</strong>, used in Australia, Canada (English-speaking), China, Sri Lanka, Switzerland (officially encouraged for currency numbers only <br/>
+			<strong>1 234,56 is SI style (French version)</strong>, used in Albania, Belgium (French), Bulgaria, Canada (French-speaking), Czech Republic, Estonia, Finland, France, Hungary, Latin Europe, Latvia, Lithuania, Norway, Peru, Poland, Portugal, Russia, Slovakia, South Africa, Sweden, Switzerland, Ukraine, Vietnam.
+			<br/>
+			<strong>1.234,56</strong> is not official SI style but it is widely used in Argentina, Austria, Belgium (Dutch), Bosnia and Herzegovina, Brazil, Chile, Colombia, Costa Rica, Croatia, Denmark, Germany, Greece, Indonesia, Italy, Netherlands, Romania, Serbia, Slovenia, Spain, Turkey, Vietnam. <br/>
+			<strong>1,234.56</strong> is not official SI style but it is widely used Canada (English-speaking; unofficial), China, Hong Kong, Ireland, Israel, Japan, Korea, Malaysia, México, New Zealand, Pakistan, Philippines, Singapore, Taiwan, Thailand, United Kingdom, United States. 
+		</p><br />
+        <p>As of 2019, the <strong>USA is the only country</strong> that has not officially adopted Metric / SI System, even though the <strong>Metric Conversion Act from 1975</strong> made the metric system "the preferred system of weights and measures for U.S. trade and commerce". Myanmar and Liberia officially adopted SI System recently. </p>
+		<button id="save" style="margin-top: 10px; margin-bottom: 10px; width: 100px; text-align: center;">Save Settings</button>
+        <div id="status" style="color:seagreen; font-weight: bold;"></div>
+		<br />
+		<p>I hope this extension is useful to you in your daily life and is simplifying your cooking, shopping, and understanding of the US and (some) UK sites. <br />If you like it, you can buy me a coffee via PayPal:  </p>
+		
+		<a href="https://paypal.me/milospa" target="_blank">
+			<img src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif" title="PayPal - The safer, easier way to pay online!" alt="Donate with PayPal button" />
+        </a>
+		<p>If this add-on doesn't work correctly on a certain page, <br />please send me an <strong>email</strong> with the problematic page link <a href="mailto:metric@milosparipovic.com">metric@milosparipovic.com</a> </p>
+		<p>This extension is now <strong>Open Source</strong> (<a href="https://github.com/m1l/Everything-Metric">https://github.com/m1l/Everything-Metric</a>)</p>
+        <p>
+        SI System is a communication tool. Leave comments on your favorite blogs and other sites that still use USCS/Imperial system asking them to use international units, and let's make this extension unnecessary.</p>
+        <p>You may find my other free projects useful: <a href="http://uxd2.com/software.html">http://uxd2.com/software.html</a></p>
+		<script src="options.js"></script>
+	</body>
 </html>
+
