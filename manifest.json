@@ -4,7 +4,7 @@
   "author":"Milos Paripovic",
   "manifest_version": 2,
   "name": "Everything Metric - Auto Unit Converter",
-  "version": "3.0",
+  "version": "3.1",
   "icons": {
     "48": "icons/everything-metric-48.png",
     "128": "icons/everything-metric-128.png"

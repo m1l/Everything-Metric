@@ -304,7 +304,7 @@ function processAll(text) {
 
 					//includes a bracket, it is probably already converted. ex: 1 in (2.54 cm)
                    
-					if (BracketsCheck(text)) continue;
+					if (BracketsCheck(matches[0])) continue;
 
 					if ((matches[2] !== undefined) && (/(?:^|\s)([-−]?\d*\.?\d+|\d{1,3}(?:,\d{3})*(?:\.\d+)?)(?!\S)/g.test(matches[2]) === false)) continue;
 
@@ -630,7 +630,7 @@ function AxAxAin(text) {
 		while ((matches = regex.exec(text)) !== null) {
 			try {
 				const fullMatch = matches[1];
-                if (BracketsCheck(text)) continue;
+                if (BracketsCheck(matches[0])) continue;
                 
 				let scale = 2.54;
 				let unit = spc + "cm";
@@ -731,7 +731,7 @@ function AxAin(text) {
 				const fullMatch = matches[1];
 				if (/[0-9][X|x|\*|×][ \u00A0][0-9]/.test(fullMatch))
 					continue; //it is 2x 2in something so no conversion                
-				if (BracketsCheck(text)) continue;
+				if (BracketsCheck(matches[0])) continue;
 
 				let scale = 2.54;
 				let unit = spc + "cm";
@@ -769,7 +769,7 @@ function AxAft(text) {
 				const fullMatch = matches[1];
 				if (/[0-9][x|X|\*|×][ \u00A0][0-9]/.test(fullMatch))
 					continue; //it is 2x 2ft something so no conversion    
-				if (BracketsCheck(text)) continue;
+				if (BracketsCheck(matches[0])) continue;
 
 				let scale = 0.3048;
 				let unit = spc + "m";
@@ -810,7 +810,7 @@ function feetInch(text) {
 			//for (var i=0; i<matches.length; i++)
 			//    console.log("matches " + i + " " + matches[i])
 			const fullMatch = matches[1];
-            if (BracketsCheck(text)) continue;
+            if (BracketsCheck(matches[0])) continue;
 
 			if (/“/.test(fullMatch)) {
 				lastQuoteOpen = true;
