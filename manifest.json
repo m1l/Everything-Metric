@@ -4,9 +4,15 @@
   "author":"Milos Paripovic",
   "manifest_version": 2,
   "name": "Everything Metric - Auto Unit Converter",
-  "version": "3.1",
+  "short_name": "Everything Metric",
+  "version": "3.2",
   "icons": {
+    "16": "icons/everything-metric-16.png",
+    "19": "icons/everything-metric-19.png",
+    "32": "icons/everything-metric-32.png",
+    "38": "icons/everything-metric-38.png",
     "48": "icons/everything-metric-48.png",
+    "96": "icons/everything-metric-96.png",
     "128": "icons/everything-metric-128.png"
   },
   "permissions": [
@@ -21,6 +27,7 @@
     "32": "icons/everything-metric-32.png",
     "38": "icons/everything-metric-38.png",
     "48": "icons/everything-metric-48.png",
+    "96": "icons/everything-metric-96.png",
     "128": "icons/everything-metric-128.png"
   },
   "default_title": "Automatic Metric/SI conversion"

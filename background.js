@@ -9,31 +9,37 @@ var useKelvin;
 var convertBracketed;
 var enableOnStart;
 var matchIn;
+var includeQuotes;
 
 function updateIcon() {
     if (metricIsEnabled===true)
 	{
 		chrome.browserAction.setIcon({
 			path: {
-				16: "icons/everything-metric-16.png",
-				32: "icons/everything-metric-32.png",
-				48: "icons/everything-metric-48.png",
-				128: "icons/everything-metric-128.png"
+                "16": "icons/everything-metric-16.png",
+                "19": "icons/everything-metric-19.png",
+                "32": "icons/everything-metric-32.png",
+                "38": "icons/everything-metric-38.png",
+                "48": "icons/everything-metric-48.png",
+                "96": "icons/everything-metric-96.png",
+                "128": "icons/everything-metric-128.png"
 			}
 		});        
-		chrome.browserAction.setTitle({title: "Automatic Metric/SI conversion is ON"});            
+		chrome.browserAction.setTitle({title: "Automatic 𝗠𝗲𝘁𝗿𝗶𝗰/SI conversion is 𝗢𝗡.\nYou can customize it in 𝗘𝘅𝘁𝗲𝗻𝘀𝗶𝗼𝗻 𝗢𝗽𝘁𝗶𝗼𝗻𝘀"});  //𝗔𝗱𝗱-𝗼𝗻 for FF
 	}
     else
 	{
 		chrome.browserAction.setIcon({
 			path: {
-				16: "icons/everything-metric-16-off.png",
-				32: "icons/everything-metric-32-off.png",
-				48: "icons/everything-metric-48-off.png",
-				128: "icons/everything-metric-128-off.png"
+                "16": "icons/everything-metric-16-off.png",
+                "19": "icons/everything-metric-19-off.png",
+                "32": "icons/everything-metric-32-off.png",
+                "38": "icons/everything-metric-38-off.png",
+                "48": "icons/everything-metric-48-off.png",
+                "96": "icons/everything-metric-96-off.png"
 			}
 		});
-		chrome.browserAction.setTitle({title: "Automatic Metric/SI conversion is OFF"});           
+		chrome.browserAction.setTitle({title: "Automatic 𝗠𝗲𝘁𝗿𝗶𝗰/SI conversion is 𝗢𝗙𝗙.\nPress 𝗔𝗟𝗧+𝗠 to convert page without turning it ON"});           
 	}
 }  
 
@@ -76,6 +82,7 @@ chrome.runtime.onMessage.addListener(
             response.convertBracketed=convertBracketed;
             response.enableOnStart=enableOnStart;
             response.matchIn=matchIn;
+            response.includeQuotes=includeQuotes;
 			sendResponse(response);
 		}
         else { //request to reload
@@ -98,9 +105,10 @@ function restore_options() {
         useBold: false,
         useBrackets: true,
         useMetricOnly: false,
-        convertBracketed: false,
+        convertBracketed: true,
         enableOnStart: true,
-        matchIn: false
+        matchIn: false,
+        includeQuotes: true
 	}, function(items) {    
 		useComma = items.useComma;
 		useMM = items.useMM;
@@ -115,6 +123,7 @@ function restore_options() {
         convertBracketed = items.convertBracketed;
         enableOnStart = items.enableOnStart;
         matchIn = items.matchIn;
+        includeQuotes = items.includeQuotes;
 		if (items.isFirstRun===true) 
 		{
 			console.log("firstrun");

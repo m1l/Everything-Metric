@@ -16,6 +16,7 @@ var useMetricOnly;
 var totalConversions;
 var convertBracketed;
 var matchIn;
+var includeQuotes;
 var isparsing=false;
 
 var fractions = {
@@ -47,19 +48,16 @@ const spc = '\u00A0';
 const intOrFloatNoFrac = '([\.,0-9]+(?![\/⁄]))?';
 const skipbrackets = '(?! [\(][0-9]|\u200B\u3010)';
 const unitSuffix = '(?! [\(][0-9]| ?\u200B\u3010)([^a-z]|$)';
-const unitSuffixIn = '(?! ?[\(\-−\u00A0]?[0-9]| ?\u200B\u3010)([^a-z²³]|$)';
-const unitSuffixft = '(?! ?[\(\-−\u00A0]?[0-9]| ?\u200B\u3010)([^a-z²³]|$)';
+//const unitSuffixIn = '(?! ?[\(\-−\u00A0]?[0-9]| ?\u200B\u3010)([^a-z²³]|$)';
+const unitSuffixIn = '(?! ?[\(\-−\u00A0]?[0-9]| ?\u200B\u3010)([^a-z²³\u3010\u200B\)]|$)';
+const unitSuffixft = '(?! ?[\(\-−\u00A0]?[0-9]| ?\u200B\u3010)([^a-z²³\u3010\u200B\)]|$)';
 const unitfrac = '[\-− \u00A0]?([¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞]|[0-9]+[\/⁄][0-9]+)?';
 const sqcu = '([\-− \u00A0]?(sq\.?|square|cu\.?|cubic))?';
 const sq = '([\-− \u00A0]?(sq\.?|square))?';
 const skipempty = '^(?:[ \n\t]+)?';
 
 const units = [{
-	regex: new RegExp(regstart + intOrFloatSigned + '[ \u00A0]?(°|º|deg(rees)?)[ \u00A0]?F(ahrenheits?)?' + unitSuffix + ')', 'ig'),
-	unit: '°C',
-	multiplier: 1
-}, {
-	regex: new RegExp(regstart + '([0-9]+)[ \u00A0]?degrees(?![ \u00A0]?F))' + unitSuffix, 'g'),
+    regexUnit: new RegExp(skipempty + '((°|º|deg(rees)?)[ \u00A0]?F(ahrenheits?)?|[\u2109])' + skipbrackets + regend, 'ig'),	
 	unit: '°C',
 	multiplier: 1
 }, {
@@ -67,7 +65,8 @@ const units = [{
 	// (?:in )?  to exclude converting "born in 1948 in"
 	//old regex: new RegExp('((?:in )?[a-z#$€£\(]?' + intOrFloatNoFrac + unitfrac + sqcu + '[-− \u00A0]?in(ch|ches|²|³)?' + unitSuffixIn + ')', 'ig'), 
 	//added (?=[0-9]) otherwise it will match "it is in something"    
-	regex: new RegExp('((?:in)?[a-z#$€£\(]?(?=[0-9¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞])([\.,0-9]+(?![\/⁄]))?[-− \u00A0]?([¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞]|[0-9]+[\/⁄][0-9]+)?([-− \u00A0]?(sq\.?|square|cu\.?|cubic))?[-− \u00A0]?(?:in(ch|ches|²|³)?)( [a-z]+)?'+unitSuffixIn+')', 'ig'),
+	//regex: new RegExp('((?:in)?[a-z#$€£\(]?(?=[0-9¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞])([\.,0-9]+(?![\/⁄]))?[-− \u00A0]?([¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞]|[0-9]+[\/⁄][0-9]+)?([-− \u00A0]?(sq\.?|square|cu\.?|cubic))?[-− \u00A0]?(?:in(ch|ches|²|³)?)( [a-z]+)?'+unitSuffixIn+')', 'ig'),
+    regex: new RegExp('((?:in)?[a-z#$€£\(]?(?=[0-9¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞])([\.,0-9]+(?![\/⁄]))?[-− \u00A0]?([¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞]|[0-9]+[\/⁄][0-9]+)?([-− \u00A0]?(sq\.?|square|cu\.?|cubic))?[-− \u00A0]?(in(ch|ches|²|³)?[\)]?)( [a-z]+)?'+unitSuffixIn+')', 'ig'),
 	unit: 'cm',
 	unit2: 'mm',
 	multiplier: 2.54,
@@ -80,7 +79,7 @@ const units = [{
 	unit: 'm',
 	multiplier: 0.3048
 }, {
-	regex: new RegExp(regstart + intOrFloatNoFrac + unitfrac + sqcu + '[\-− \u00A0]?(feet|foot|ft)(²|³)?' + unitSuffixft + ')', 'ig'),
+	regex: new RegExp(regstart + intOrFloatNoFrac + unitfrac + sqcu + '[\-− \u00A0]?(feet|foot|ft)(²|³)?[\)]?' + unitSuffixft + ')', 'ig'),
 	unit: 'm',
 	multiplier: 0.3048,
 	multipliercu: 28.31690879986443
@@ -190,6 +189,7 @@ function walk(node) {
 	}
 }
 
+var foundDegreeSymbol = false;
 function procNode(textNode) {
 
 	let text = textNode.nodeValue;
@@ -198,12 +198,21 @@ function procNode(textNode) {
         return;
 
 	//skipping added for quantity and unit in separate blocks - after the number is found, sometimes next node is just a bunch of whitespace, like in cooking.nytimes, so we try again on the next node
+    
 	if (lastquantity !== undefined && lastquantity !== 0 && skips < 2) {
-		text = ParseUnitsOnly(text);        
-		if (/^[a-zA-Z]+$/g.test(text))
+		text = ParseUnitsOnly(text, foundDegreeSymbol);        
+		if (/^[a-zA-Z°º]+$/g.test(text)) {
 			lastquantity = 0;
-		else
+        }
+		else {
 			skips++;
+            if (/[°º]/g.test(text)) 
+			     foundDegreeSymbol=true;
+            else
+                foundDegreeSymbol=false;
+            
+        }
+        //console.log(text);
 	} else {        
 		lastquantity = 0;
 		if (text.length < 50) {
@@ -212,16 +221,89 @@ function procNode(textNode) {
 			skips = 0;
 		}
 	}
-    text = AxAqq(text);
-	text = feetInch(text);
-	text = AxAxAin(text);
-	text = AxAin(text);
-	text = AxAft(text);
-	text = ftin2m(text);
-	text = lboz2kg(text);
-	text = processAll(text);
-	text = mpg2Lper100km(text);
-	textNode.nodeValue = text;
+   if ((lastquantity !== undefined && lastquantity !== 0 && skips <= 2) || 
+        /[1-9]/g.test(text)) {
+        text = AxAqq(text);
+        if (includeQuotes)
+            text = feetInch(text);
+        text = AxAxAin(text);
+        text = AxAin(text);
+        text = AxAft(text);
+        text = ftin2m(text);
+        text = lboz2kg(text);
+        text = processAll(text);
+        text = mpg2Lper100km(text);
+        text = Fahrenheit(text);
+        textNode.nodeValue = text;
+    }
+}
+
+function Fahrenheit(text) {
+
+	let regex = new RegExp('([\(]?([\-−])?(([0-9,\.]+)( to |[\-−]))?([\-0-9,\.]+)[ \u00A0]?(((°|º|deg(rees)?)[ \u00A0]?F(ahrenheits?)?)|(Fahrenheits?)|[\u2109])(?! ?[\(][0-9]| ?\u200B\u3010)([^a-z]|$))', 'ig');
+
+	if (text.search(regex) !== -1) {
+		let matches;
+
+		while ((matches = regex.exec(text)) !== null) {
+			try {
+                //console.log(matches[0]);
+                if (BracketsCheck(matches[0])) continue;
+				const fullMatch = matches[1];
+                
+                //for (var i=0; i<matches.length; i++)
+			    //console.log("matches " + i + " " + matches[i])
+                var imp1 = matches[4];
+                var imp2 = matches[6];
+                var unit = '°C';
+                var met1='';
+                var met2=0;
+                if (imp1!==undefined) { //is range
+                    if (matches[2]!==undefined) 
+                        met1 = convertToC(-imp1);
+                    else
+                        met1 = convertToC(imp1);
+                    
+                    if (useKelvin) {
+                        met1 += 273.15;
+                        met1 = roundNicely(met1);
+                    }
+                }
+                
+                if ((/[\-−]/.test(imp2.charAt(0))) ||
+                    (imp1===undefined && matches[2]!==undefined)){
+				    met2 = convertToC(-imp2);
+			     } else 
+                     met2 = convertToC(imp2);
+                
+                /*if (matches[3]!==undefined) { //is range
+                    if (matches[2]!==undefined) 
+                        met1 = -convertToC(imp);
+                    else
+                        met1 = convertToC(imp);
+                }*/
+                
+                
+                if (useKelvin) {
+                    met2 += 273.15;
+                    met2 = roundNicely(met2);
+                    unit = 'K';
+                }
+				
+				var met='';
+                if (imp1!==undefined)
+                    met = met1 + ' to ';
+                met += met2;
+
+				const insertIndex = GetIndexPos(matches.index, fullMatch);				
+				const metStr = prepareForOutput(met, unit, false);
+				text = insertAt(text, metStr, insertIndex);
+			} catch (err) {
+				console.log(err.message);
+			}
+		}
+	}
+	return text;
 }
 
 
@@ -238,7 +320,7 @@ function mpg2Lper100km(text) {
                 if (BracketsCheck(matches[0])) continue;
 				const fullMatch = matches[1];
                 
-                for (var i=0; i<matches.length; i++)
+                //for (var i=0; i<matches.length; i++)
 			    //console.log("matches " + i + " " + matches[i])
 				
 				var imp = matches[2];
@@ -296,6 +378,7 @@ function processAll(text) {
 
 	const len = units.length;
 	for (let i = 0; i < len; i++) {
+        if (units[i].regex===undefined) continue;
 		if (text.search(units[i].regex) !== -1) {
 			let matches;
 
@@ -309,7 +392,7 @@ function processAll(text) {
 					if ((matches[2] !== undefined) && (/(?:^|\s)([-−]?\d*\.?\d+|\d{1,3}(?:,\d{3})*(?:\.\d+)?)(?!\S)/g.test(matches[2]) === false)) continue;
 
 					let subtract = 0;
-					if (i == 2) {
+					if (i == 1) { //in
 						//if (/[a-z#$€£]/i.test(matches[1].substring(0,1)))                      
 						if (/^[a-z#$€£]/i.test(matches[0]))
 							continue;
@@ -317,28 +400,29 @@ function processAll(text) {
 							continue;
                         if (!matchIn && / in /i.test(matches[0])) //born in 1948 in ...
 							continue;
-						if (matches[7] !== undefined) {
+						if (matches[8] !== undefined) {
 							if (hasNumber(matches[7])) continue; //for 1 in 2 somethings
-							if (matches[7] == ' a') continue;
-							if (matches[7] == ' an') continue;
-							if (matches[7] == ' the') continue;
-							if (matches[7] == ' my') continue;
-							if (matches[7] == ' his') continue;
-							if (matches[7] == '-') continue;
-							if (/ her/.test(matches[7])) continue;
-							if (/ their/.test(matches[7])) continue;
-							if (/ our/.test(matches[7])) continue;
-							if (/ your/.test(matches[7])) continue;
-							subtract = matches[7].length;
+							if (matches[8] == ' a') continue;
+							if (matches[8] == ' an') continue;
+							if (matches[8] == ' the') continue;
+							if (matches[8] == ' my') continue;
+							if (matches[8] == ' his') continue;
+							if (matches[8] == '-') continue;
+							if (/ her/.test(matches[8])) continue;
+							if (/ their/.test(matches[8])) continue;
+							if (/ our/.test(matches[8])) continue;
+							if (/ your/.test(matches[8])) continue;
+							subtract = matches[8].length;
 						}
 					}
-					if (i == 3) {
+					if (i == 2) { //ft
 						if (/[°º]/.test(matches[1])) continue;
 						if (/\d/ig.test(matches[5])) continue; //avoid 3' 5"
 					}
-                    /*for (var it=0; it<matches.length; it++)
+                    /*if (i== 1)
+                    for (var it=0; it<matches.length; it++)
 			         console.log("matches " + it + " " + matches[it]);
-                    */  
+                     */
 					let suffix = '';
 
 					//if (/[\(\)]/.test(matches[0])) continue;
@@ -360,7 +444,7 @@ function processAll(text) {
 					if (isNaN(imp))
 						imp = 0;
                     
-                    if (i == 2 && / in /i.test(matches[0]) && imp > 1000)
+                    if (i == 1 && / in /i.test(matches[0]) && imp > 1000)
 							continue; //prevents 1960 in Germany
 
 					if (matches[3] === '/') continue; // 2,438/sqft
@@ -426,14 +510,15 @@ function convAndForm(imp, unitIndex, suffix) {
 		((useMM === true && units[unitIndex].multiplier2 !== undefined && units[unitIndex].fullround) || units[unitIndex].forceround));
 
 	var met;
-	if (unitIndex < 2 ) {
+	/*if (unitIndex < 2 ) {
 		met = convertToC(imp);
 		if (useKelvin) {
 			met += 273.15;
 			met = roundNicely(met);
 			unit = 'K';
 		}
-	} else if (suffix === '²')
+	} else*/
+    if (suffix === '²')
 		met = convert(imp, Math.pow(multiplier, 2), round);
 	else if (suffix === '³') {
 		met = convert(imp, units[unitIndex].multipliercu, round);
@@ -622,7 +707,7 @@ function insertAt(target, toInsert, index) {
 //1 x 2 x 3
 function AxAxAin(text) {
 
-	let regex = new RegExp('[\(]?(([0-9]+(\.[0-9]+)?)[ \u00A0]?[x|\*][ \u00A0]?([0-9]+(\.[0-9]+)?)[ \u00A0]?[x|\*][ \u00A0]?([0-9]+(\.[0-9]+)?)[ \u00A0]?in(ch|ches|.)?)' + unitSuffix, 'ig');
+	let regex = new RegExp('[\(]?(([0-9]+(\.[0-9]+)?)[ \u00A0]?[x\*×][ \u00A0]?([0-9]+(\.[0-9]+)?)[ \u00A0]?[x\*×][ \u00A0]?([0-9]+(\.[0-9]+)?)[ \u00A0]?in(ch|ches|.)?)' + unitSuffix, 'ig');
 
 	if (text.search(regex) !== -1) {
 		let matches;
@@ -659,7 +744,7 @@ function AxAxAin(text) {
 function AxAqq(text) {//ikea US
 
 
-	let regex = new RegExp('((?<!\/)(([0-9]+(?!\/))[\-− \u00A0]([0-9]+[\/⁄][0-9\.]+)?) ?[x|\*|×] ?(([0-9]+(?!\/))?[\-− \u00A0]([0-9]+[\/⁄][0-9\.]+)?)? ?("|″|”|“|’’|\'\'|′′)([^a-z]|$))', 'ig');
+	let regex = new RegExp('((?<!\/)(([0-9]+(?!\/))[\-− \u00A0]([0-9]+[\/⁄][0-9\.]+)?) ?[x\*×] ?(([0-9]+(?!\/))?[\-− \u00A0]([0-9]+[\/⁄][0-9\.]+)?)? ?("|″|”|“|’’|\'\'|′′)([^a-z]|$))', 'ig');
 //new ((([\.0-9]+(?!\/)(\.[0-9]+)?)?[\-− \u00A0]([0-9]+[\/⁄][0-9\.]+)?)? ?("|″|”|“|’’|\'\'|′′)([^a-z]|$)))
 	let matches;
 
@@ -720,7 +805,7 @@ function AxAqq(text) {//ikea US
 // 1 x 2 in
 function AxAin(text) {
 
-	let regex = new RegExp('[\(]?(([0-9]+(\.[0-9]+)?)[-− \u00A0]?[x|\*|×][-− \u00A0]?([0-9]+(\.[0-9]+)?)[-− \u00A0]?in(ch|ches|\.)?)' + unitSuffix, 'ig');
+	let regex = new RegExp('[\(]?(([0-9]+(\.[0-9]+)?)[-− \u00A0]?[x\*×][-− \u00A0]?([0-9]+(\.[0-9]+)?)[-− \u00A0]?in(ch|ches|\.)?)' + unitSuffix, 'ig');
 
 	if (text.search(regex) !== -1) {
 		let matches;
@@ -729,7 +814,7 @@ function AxAin(text) {
 			try {
 
 				const fullMatch = matches[1];
-				if (/[0-9][X|x|\*|×][ \u00A0][0-9]/.test(fullMatch))
+				if (/[0-9][Xx\*×][ \u00A0][0-9]/.test(fullMatch))
 					continue; //it is 2x 2in something so no conversion                
 				if (BracketsCheck(matches[0])) continue;
 
@@ -759,7 +844,7 @@ function AxAin(text) {
 // 1' x 2'
 function AxAft(text) {
 
-	let regex = new RegExp('[\(]?(([0-9]+(\.[0-9]+)?)[\'′’]?[-− \u00A0]?[x|\*|×][-− \u00A0]?([0-9]+(\.[0-9]+)?)[-− \u00A0]?(feet|foot|ft|[\'′’]))' + unitSuffix, 'ig');
+	let regex = new RegExp('[\(]?(([0-9]+(\.[0-9]+)?)[\'′’]?[-− \u00A0]?[x\*×][-− \u00A0]?([0-9]+(\.[0-9]+)?)[-− \u00A0]?(feet|foot|ft|[\'′’]))(?![0-9])' + unitSuffix, 'ig');
 
 	if (text.search(regex) !== -1) {
 		let matches;
@@ -767,7 +852,7 @@ function AxAft(text) {
 		while ((matches = regex.exec(text)) !== null) {
 			try {
 				const fullMatch = matches[1];
-				if (/[0-9][x|X|\*|×][ \u00A0][0-9]/.test(fullMatch))
+				if (/[0-9][xX\*×][ \u00A0][0-9]/.test(fullMatch))
 					continue; //it is 2x 2ft something so no conversion    
 				if (BracketsCheck(matches[0])) continue;
 
@@ -799,52 +884,92 @@ function hasNumber(myString) {
 //1' 2"
 function feetInch(text) {
 
-	let regex = new RegExp('([°|º]? ?(([0-9]{0,3})[\'’′][\-− \u00A0]?)?(([\.0-9]+(?!\/)(\.[0-9]+)?)?[\-− \u00A0]?([^ a-z,\?\.\!]|[0-9]+[\/⁄][0-9\.]+)?)? ?("|″|”|“|’’|\'\'|′′)'+unitSuffix+')', 'g');
-//new ((([\.0-9]+(?!\/)(\.[0-9]+)?)?[\-− \u00A0]([0-9]+[\/⁄][0-9\.]+)?)? ?("|″|”|“|’’|\'\'|′′)([^a-z]|$)))
+	/*let regex = new RegExp('([°º]? ?(([0-9]{0,3})[\'’′][\-− \u00A0]?)?(([\.0-9]+(?!\/)(\.[0-9]+)?)?[\-− \u00A0]?([^ a-z,\?\.\!\]]|[0-9]+[\/⁄][0-9\.]+)?)? ?("|″|”|“|’’|\'\'|′′)'+unitSuffix+')|(["″”“\n])', 'g');  from v3.1*/ 
+
+    //let regex = new RegExp('([°ºa-z]?( {0,1}([0-9]{1,3})[\'’′][\-− \u00A0]?)?(([\.0-9]+(?!\/)(?:[\-− \u00A0]?))?([¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞]|[0-9]+[\/⁄][0-9\.]+)?)? ?("|″|”|“|’’|\'\'|′′)(?! [\(][0-9]| ?\u200B\u3010)([^a-z]|$))|(\d["″”“\n])', 'g');
+    //(\d?["″”“\n]) is here if there is a quote we want to match it but if the number is in front then it was one of the discarded matches from above
+    //in 1' 2-3/4"
+    //1 is g3
+    //2 is g5
+    //3/4 is g6
+    //if (!hasNumber(text))
+    //    return text;
+    //console.log(text);
+    let regex = new RegExp('(([°º]?([ a-z]{0,1}([0-9]{1,3})[\'’′][\-− \u00A0]?)?((([\.0-9]+)(?!\/)(?:[\-− \u00A0]?))?([¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞]|[0-9]+[\/⁄][0-9\.]+)?)? ?("|″|”|“|’’|\'\'|′′))|(["″”“\n]))(?! [\(][0-9]| ?\u200B\u3010)', 'gi');
+    //in 1' 2-3/4"
+    //1 is g4
+    //2 is g7
+    //3/4 is g8
+    //" is g9
 	let matches;
 
 	let lastQuoteOpen = false;
 	while ((matches = regex.exec(text)) !== null) {
 		try {
-
-			//for (var i=0; i<matches.length; i++)
-			//    console.log("matches " + i + " " + matches[i])
+            /*console.log(lastQuoteOpen);
+			for (var i=0; i<matches.length; i++)
+			    console.log("matches " + i + " " + matches[i]);
+            console.log("------------------");*/
 			const fullMatch = matches[1];
+            
+            if (lastQuoteOpen) {
+				    lastQuoteOpen = false; 
+				continue;
+                }
+            
+            if (matches[10]!==undefined && matches[10]==='\n') {
+                    lastQuoteOpen = false; //new line, ignore
+                continue;
+            }
+             
+            if (!hasNumber(matches[1])) {
+				    lastQuoteOpen = !lastQuoteOpen; 
+				continue;
+                }
+            
+            
+        
             if (BracketsCheck(matches[0])) continue;
 
-			if (/“/.test(fullMatch)) {
+			/*if (/“/.test(fullMatch)) {
 				lastQuoteOpen = true;
 				continue;
-			}
+			}*/
 
-			if (!hasNumber(fullMatch) && !/[¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞]/.test(fullMatch) && /[\"\″]/.test(fullMatch)) {
+			/*if (!hasNumber(fullMatch) && !/[¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞]/.test(fullMatch)) {
 				lastQuoteOpen = !lastQuoteOpen;
 				continue;
-			}
-			if (lastQuoteOpen === true) {
+			}*/
+			/*if (lastQuoteOpen === true) {
 				lastQuoteOpen = false;
 				continue;
-			}
+			}*/
 
-			if (/[\(]/.test(matches[9])) continue;
-			if (/[°|º]/.test(fullMatch)) {
+			//if (/[\(]/.test(matches[9])) continue;
+			if (/[°º]/.test(fullMatch.charAt(0))) {
 				continue;
 			}
-
-			let feet = parseFloat(matches[3]);
-			if (isNaN(feet)) feet = 0;
-
-			let inches = (matches[5]);
-			if (/[⁄]/.test(matches[5])) { //improvisation, but otherwise 1⁄2 with register 1 as in
-				matches[7] = matches[5];
-				inches = 0;
-			} else {
-				inches = parseFloat(inches);
-				if (isNaN(inches)) inches = 0;
+            if (/[a-z]/i.test(fullMatch.charAt(0)) &&
+               !/[x]/i.test(fullMatch.charAt(0))) {
+                //if (!/x/i.test(fullMatch.charAt(0))) //maybe we don't care
+                lastQuoteOpen = !lastQuoteOpen;
+				    continue;
 			}
 
-			if (matches[7] !== undefined)
-				inches += addFraction(matches[7]);
+			let feet = parseFloat(matches[4]);
+			if (isNaN(feet)) feet = 0;
+
+			let inches = matches[7];
+			/*if (/[⁄]/.test(matches[5])) { //improvisation, but otherwise 1⁄2 with register 1 as in
+				matches[7] = matches[5];
+				inches = 0;
+			} else {*/
+				inches = parseFloat(inches);
+				if (isNaN(inches)) inches = 0;
+			//}
+
+			if (matches[8] !== undefined)
+				inches += addFraction(matches[8]);
 
 			if (inches === 0 || isNaN(inches)) continue;
 
@@ -852,11 +977,11 @@ function feetInch(text) {
 
 			let metStr = '';
 			if (total > 3)
-				metStr = convAndForm(feet + inches / 12, 3, ''); //3 feet
+				metStr = convAndForm(feet + inches / 12, 2, ''); //2 feet
 			else
-				metStr = convAndForm(feet * 12 + inches, 2, ''); //2 inch
+				metStr = convAndForm(feet * 12 + inches, 1, ''); //1 inch
 			const insertIndex = GetIndexPos(matches.index, fullMatch);	
-
+            
 			text = insertAt(text, metStr, insertIndex);
 
 		} catch (err) {
@@ -986,10 +1111,28 @@ function ParseUnitsOnly(text) {
 			} catch (err) {
 				//console.log(err.message);
 			}
-		}
+		}        
 
 	}
 
+    if (foundDegreeSymbol) {
+            if ( text.charAt(0)!=='F')
+                return text;
+        
+            if (text.length>=3 && /^F\u200B\u3010|^F[\(][0-9]/.test(text)) 
+                return text; //it has been already converted
+            
+                let met = convertToC(lastquantity);
+                var unit = '°C';
+                if (useKelvin) {
+                    met += 273.15;
+                    met = roundNicely(met2);
+                    unit = 'K';
+                }            
+            const metStr = prepareForOutput(met, unit, false);
+            text = insertAt(text, metStr, 1);
+
+        }
 	return text;
 }
 
@@ -1082,6 +1225,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			useMetricOnly = response.useMetricOnly;
             convertBracketed = response.convertBracketed;
             matchIn = response.matchIn;
+            includeQuotes = response.includeQuotes;
 
 			if (response.metricIsEnabled === true) {
 				let isamazon = false;
