@@ -6,7 +6,8 @@ Example: 10 feet (3 m)˜
 
 Extension published here
 https://chrome.google.com/webstore/detail/everything-metric-auto-un/hknjpaididhfgeocegbacehlnkofjoni
-(Firefox extension different fork)
+
+Firefox version is available here https://github.com/m1l/Everything-Metric-Firefox
 
 Starting code based on https://github.com/esprimo/imperial-to-metric-chrome-extension
 
