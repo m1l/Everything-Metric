@@ -13,6 +13,7 @@ function save_options() {
     var convertBracketed = document.getElementById('convertBracketed').checked;
     var matchIn = document.getElementById('matchIn').checked;
     var includeQuotes = document.getElementById('includeQuotes').checked;
+    var includeImproperSymbols = document.getElementById('includeImproperSymbols').checked;
     
 	chrome.storage.sync.set({
 		useComma: useComma,
@@ -28,7 +29,8 @@ function save_options() {
 		useMetricOnly: useMetricOnly,
         convertBracketed: convertBracketed,
         matchIn: matchIn,
-        includeQuotes: includeQuotes
+        includeQuotes: includeQuotes,
+        includeImproperSymbols: includeImproperSymbols
 	}, function() {
 		// Update status to let user know options were saved.
 		var status = document.getElementById('status');
@@ -65,7 +67,8 @@ function restore_options() {
 			useMetricOnly: false,
             convertBracketed: true,
             matchIn: false,
-            includeQuotes: true
+            includeQuotes: true,
+            includeImproperSymbols: true
 		}, function(items) {
 			document.getElementById('useComma').checked = items.useComma;
 			document.getElementById('useMM').checked = items.useMM;
@@ -80,6 +83,7 @@ function restore_options() {
             document.getElementById('convertBracketed').checked = items.convertBracketed;
             document.getElementById('matchIn').checked = items.matchIn;
             document.getElementById('includeQuotes').checked = items.includeQuotes;
+            document.getElementById('includeImproperSymbols').checked = items.includeImproperSymbols;
 		});
 	} catch (err) {
 		console.log(err.message);
@@ -100,6 +104,7 @@ document.getElementById('useMetricOnly').addEventListener('click', save_options)
 document.getElementById('convertBracketed').addEventListener('click', save_options);
 document.getElementById('matchIn').addEventListener('click', save_options);
 document.getElementById('includeQuotes').addEventListener('click', save_options);
+document.getElementById('includeImproperSymbols').addEventListener('click', save_options);
 var _selector = document.querySelector('input');
 _selector.addEventListener('change', function(event) {
 	save_options();

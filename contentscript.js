@@ -18,6 +18,7 @@ var convertBracketed;
 var matchIn;
 var includeQuotes;
 var isparsing=false;
+var includeImproperSymbols;
 
 var fractions = {
 	'¼': 0.25,
@@ -55,6 +56,7 @@ const unitfrac = '[\-− \u00A0]?([¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜
 const sqcu = '([\-− \u00A0]?(sq\.?|square|cu\.?|cubic))?';
 const sq = '([\-− \u00A0]?(sq\.?|square))?';
 const skipempty = '^(?:[ \n\t]+)?';
+var feetInchRegex;
 
 const units = [{
     regexUnit: new RegExp(skipempty + '((°|º|deg(rees)?)[ \u00A0]?F(ahrenheits?)?|[\u2109])' + skipbrackets + regend, 'ig'),	
@@ -75,7 +77,7 @@ const units = [{
 	fullround: true
 }, {
     //([\(]?[°º]? ?([\.,0-9]+(?![\/⁄]))?[-− \u00A0]?([¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞]|[0-9]+[\/⁄][0-9]+)?[-− \u00A0]?(\'|′|’)(?![\'′’])(?! ?[\(-\− \u00A0]?[0-9]| \u3010)([^a-z]|$))
-	regex: new RegExp('([\(]?[°º]? ?' + intOrFloatNoFrac + unitfrac + '[\-− \u00A0]?(\'|′|’)(?![\'′’])' + unitSuffixft + ')', 'g'),
+	regex: new RegExp('([\(]?[°º]?[ \u00A0]?' + intOrFloatNoFrac + unitfrac + '[\-− \u00A0]?(\'|′|’)(?![\'′’])' + unitSuffixft + ')', 'g'),
 	unit: 'm',
 	multiplier: 0.3048
 }, {
@@ -222,7 +224,7 @@ function procNode(textNode) {
 		}
 	}
    if ((lastquantity !== undefined && lastquantity !== 0 && skips <= 2) || 
-        /[1-9]/g.test(text)) {
+        /[1-9¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞]/g.test(text)) {
         text = AxAqq(text);
         if (includeQuotes)
             text = feetInch(text);
@@ -240,7 +242,7 @@ function procNode(textNode) {
 
 function Fahrenheit(text) {
 
-	let regex = new RegExp('([\(]?([\-−])?(([0-9,\.]+)( to |[\-−]))?([\-0-9,\.]+)[ \u00A0]?(((°|º|deg(rees)?)[ \u00A0]?F(ahrenheits?)?)|(Fahrenheits?)|[\u2109])(?! ?[\(][0-9]| ?\u200B\u3010)([^a-z]|$))', 'ig');
+	let regex = new RegExp('([\(]?([\-−])?(([0-9,\.]+)( to | and |[\-−]))?([\-0-9,\.]+)[ \u00A0]?(((°|º|deg(rees)?)[ \u00A0]?F(ahrenheits?)?)|(Fahrenheits?)|[\u2109])(?! ?[\(][0-9]| ?\u200B\u3010)([^a-z]|$))', 'ig');
 
 	if (text.search(regex) !== -1) {
 		let matches;
@@ -264,10 +266,13 @@ function Fahrenheit(text) {
                     else
                         met1 = convertToC(imp1);
                     
+                    
                     if (useKelvin) {
-                        met1 += 273.15;
+                        met1 += 273.15; 
                         met1 = roundNicely(met1);
                     }
+                    
+                    met1 = replaceWithComma(met1);
                 }
                 
                 if ((/[\-−]/.test(imp2.charAt(0))) ||
@@ -285,10 +290,12 @@ function Fahrenheit(text) {
                 
                 
                 if (useKelvin) {
-                    met2 += 273.15;
-                    met2 = roundNicely(met2);
+                    met2 += 273.15;   
                     unit = 'K';
+                    met2 = roundNicely(met2);
                 }
+                
+                met2 = replaceWithComma(met2);
 				
 				var met='';
                 if (imp1!==undefined)
@@ -696,7 +703,10 @@ function roundNicely(v) {
 
 function convertToC(f) {
 	let met = (5 / 9) * (f - 32);
-	return Math.round(met);
+    if (useKelvin) 
+       return met;
+    else
+	   return Math.round(met);
 }
 
 
@@ -895,7 +905,8 @@ function feetInch(text) {
     //if (!hasNumber(text))
     //    return text;
     //console.log(text);
-    let regex = new RegExp('(([°º]?([ a-z]{0,1}([0-9]{1,3})[\'’′][\-− \u00A0]?)?((([\.0-9]+)(?!\/)(?:[\-− \u00A0]?))?([¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞]|[0-9]+[\/⁄][0-9\.]+)?)? ?("|″|”|“|’’|\'\'|′′))|(["″”“\n]))(?! [\(][0-9]| ?\u200B\u3010)', 'gi');
+    /*let regex;
+    regex = new RegExp('(([°º]?([ \u00A0a-z]{0,1}([0-9]{1,3})[\'’′][\-− \u00A0]?)?((([\.,0-9]+)(?!\/)(?:[\-− \u00A0]?))?([¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞]|[0-9]+[\/⁄][0-9\.]+)?)? ?(\"|″|\”|“|’’|\'\'|′′))|(["″”“\n]))(?! [\(][0-9]| ?\u200B\u3010)', 'gi');*/
     //in 1' 2-3/4"
     //1 is g4
     //2 is g7
@@ -904,29 +915,32 @@ function feetInch(text) {
 	let matches;
 
 	let lastQuoteOpen = false;
-	while ((matches = regex.exec(text)) !== null) {
+	while ((matches = feetInchRegex.exec(text)) !== null) {
 		try {
+            
             /*console.log(lastQuoteOpen);
 			for (var i=0; i<matches.length; i++)
 			    console.log("matches " + i + " " + matches[i]);
             console.log("------------------");*/
 			const fullMatch = matches[1];
             
-            if (lastQuoteOpen) {
-				    lastQuoteOpen = false; 
-				continue;
-                }
-            
-            if (matches[10]!==undefined && matches[10]==='\n') {
+            if (includeImproperSymbols) {
+                
+                if (lastQuoteOpen) {
+                    lastQuoteOpen = false; 
+                    continue;
+                    }
+
+                if (matches[10]!==undefined && matches[10]==='\n') {
                     lastQuoteOpen = false; //new line, ignore
-                continue;
-            }
-             
-            if (!hasNumber(matches[1])) {
-				    lastQuoteOpen = !lastQuoteOpen; 
-				continue;
+                    continue;
                 }
-            
+
+                if (!hasNumber(matches[1]) && !/[¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞]/g.test(matches[1])) {
+                    lastQuoteOpen = !lastQuoteOpen; 
+                    continue;
+                }
+            }
             
         
             if (BracketsCheck(matches[0])) continue;
@@ -946,6 +960,7 @@ function feetInch(text) {
 			}*/
 
 			//if (/[\(]/.test(matches[9])) continue;
+            
 			if (/[°º]/.test(fullMatch.charAt(0))) {
 				continue;
 			}
@@ -958,8 +973,12 @@ function feetInch(text) {
 
 			let feet = parseFloat(matches[4]);
 			if (isNaN(feet)) feet = 0;
-
+                
 			let inches = matches[7];
+            if (inches!==undefined && inches.length<5) //someone used , instead of . for decimals
+                inches=inches.replace(',', '.');
+            
+            
 			/*if (/[⁄]/.test(matches[5])) { //improvisation, but otherwise 1⁄2 with register 1 as in
 				matches[7] = matches[5];
 				inches = 0;
@@ -970,6 +989,7 @@ function feetInch(text) {
 
 			if (matches[8] !== undefined)
 				inches += addFraction(matches[8]);
+            
 
 			if (inches === 0 || isNaN(inches)) continue;
 
@@ -1123,12 +1143,15 @@ function ParseUnitsOnly(text) {
                 return text; //it has been already converted
             
                 let met = convertToC(lastquantity);
+                
                 var unit = '°C';
                 if (useKelvin) {
-                    met += 273.15;
-                    met = roundNicely(met2);
+                    met += 273.15;   
                     unit = 'K';
-                }            
+                    met = roundNicely(met);
+                } 
+            
+            met = replaceWithComma(met);
             const metStr = prepareForOutput(met, unit, false);
             text = insertAt(text, metStr, 1);
 
@@ -1193,6 +1216,19 @@ function FlashMessage() {
     x.className = "show";
     setTimeout(function(){ x.className = x.className.replace("show", ""); }, 1500);
 }
+        
+function InitRegex(){
+    
+    if (includeImproperSymbols) {        
+        feetInchRegex = new RegExp('(([°º]?([ \u00A0a-z]{0,1}([0-9]{1,3})[\'’′][\-− \u00A0]?)?((([\.,0-9]+)(?!\/)(?:[\-− \u00A0]?))?([¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞]|[0-9]+[\/⁄][0-9\.]+)?)?[ \u00A0]?(\"|″|”|“|’’|\'\'|′′))|(["″”“\n]))(?! [\(][0-9]| ?\u200B\u3010)', 'gi');
+    }
+    else {
+        feetInchRegex = new RegExp('(([°º]?([ \u00A0a-z]{0,1}([0-9]{1,3})[′][\-− \u00A0]?)?((([\.,0-9]+)(?!\/)(?:[\-− \u00A0]?))?([¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞]|[0-9]+[\/⁄][0-9\.]+)?)?[ \u00A0]?(″|′′)))(?! [\(][0-9]| ?\u200B\u3010)', 'gi');
+        
+        //only for foot
+        units[2].regex = new RegExp('([\(]?[°º]?[ \u00A0]?' + intOrFloatNoFrac + unitfrac + '[\-− \u00A0]?([′])(?![′])' + unitSuffixft + ')', 'g');
+    }   
+}        
 
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -1213,6 +1249,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			message: "Is metric enabled"
 		},
 		function(response) {
+            metricIsEnabled = response.metricIsEnabled;
 			useComma = response.useComma;
 			useMM = response.useMM;
 			useRounding = response.useRounding;
@@ -1226,13 +1263,15 @@ document.addEventListener('DOMContentLoaded', function() {
             convertBracketed = response.convertBracketed;
             matchIn = response.matchIn;
             includeQuotes = response.includeQuotes;
-
+            includeImproperSymbols = response.includeImproperSymbols;
+			InitRegex();
 			if (response.metricIsEnabled === true) {
+                
 				let isamazon = false;
 				if (/\.amazon\./.test(window.location.toString())) isamazon = true;
 				if (/\.uk\//.test(window.location.toString())) isUK = true;
                 if (isamazon) {
-                    var div = document.getElementById("MetricAmazonHelper"); 
+                    var div = document.getElementById("AmazonMetricHelper"); 
                     if (div===null)
                         div = document.createElement('div');
                     else
@@ -1249,7 +1288,6 @@ document.addEventListener('DOMContentLoaded', function() {
 			}
 		}
 	); 
-    
 }, false);
 /*
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {

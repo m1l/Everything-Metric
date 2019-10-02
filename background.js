@@ -1,4 +1,4 @@
-var metricIsEnabled = true;
+var metricIsEnabled;
 var useComma;
 var useMM;
 var useRounding;
@@ -10,6 +10,7 @@ var convertBracketed;
 var enableOnStart;
 var matchIn;
 var includeQuotes;
+var includeImproperSymbols;
 
 function updateIcon() {
     if (metricIsEnabled===true)
@@ -39,7 +40,7 @@ function updateIcon() {
                 "96": "icons/everything-metric-96-off.png"
 			}
 		});
-		chrome.browserAction.setTitle({title: "Automatic 𝗠𝗲𝘁𝗿𝗶𝗰/SI conversion is 𝗢𝗙𝗙.\nPress 𝗔𝗟𝗧+𝗠 to convert page without turning it ON"});           
+		chrome.browserAction.setTitle({title: "Automatic 𝗠𝗲𝘁𝗿𝗶𝗰/SI conversion is 𝗢𝗙𝗙.\nPress 𝗔𝗟𝗧+𝗠 to convert page without turning it ON"});            
 	}
 }  
 
@@ -54,7 +55,7 @@ function toggleMetric() {
 	updateIcon();    
     
     chrome.storage.sync.set({
-        enableOnStart: metricIsEnabled
+        metricIsEnabled: metricIsEnabled
 	}, function() {		
 	});
 }
@@ -83,17 +84,20 @@ chrome.runtime.onMessage.addListener(
             response.enableOnStart=enableOnStart;
             response.matchIn=matchIn;
             response.includeQuotes=includeQuotes;
+            response.includeImproperSymbols=includeImproperSymbols;
 			sendResponse(response);
 		}
         else { //request to reload
             restore_options();
             sendResponse("ok");
         }
+        updateIcon();   
     }
 );
 
 function restore_options() {
 	chrome.storage.sync.get({
+        metricIsEnabled:true,
 		useComma:true,
 		useMM:false,
 		useRounding:true,
@@ -108,8 +112,10 @@ function restore_options() {
         convertBracketed: true,
         enableOnStart: true,
         matchIn: false,
-        includeQuotes: true
+        includeQuotes: true,
+        includeImproperSymbols: true
 	}, function(items) {    
+        metricIsEnabled = items.metricIsEnabled;
 		useComma = items.useComma;
 		useMM = items.useMM;
 		useRounding = items.useRounding; 
@@ -124,6 +130,7 @@ function restore_options() {
         enableOnStart = items.enableOnStart;
         matchIn = items.matchIn;
         includeQuotes = items.includeQuotes;
+        includeImproperSymbols = items.includeImproperSymbols;
 		if (items.isFirstRun===true) 
 		{
 			console.log("firstrun");
