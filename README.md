@@ -4,7 +4,9 @@ Automatically translates all sites from American and Imperial units to Internati
 
 Example: 10 feet (3 m)˜
 
-Extension published here
+Extension for * Microsoft Edge * (Chromium) is being published at Microsoft Store... link will be provided as soon as it passes certification
+
+Extension for Chrome is published here 
 https://chrome.google.com/webstore/detail/everything-metric-auto-un/hknjpaididhfgeocegbacehlnkofjoni
 
 Firefox version is available here https://github.com/m1l/Everything-Metric-Firefox
