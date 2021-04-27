@@ -125,7 +125,7 @@ function restore_options() {
         useKelvin = items.useKelvin;
         useBold= items.useBold;
         useBrackets= items.useBrackets;
-        useMetricOnly= items.useBold;
+        useMetricOnly= items.useMetricOnly;
         convertBracketed = items.convertBracketed;
         enableOnStart = items.enableOnStart;
         matchIn = items.matchIn;
