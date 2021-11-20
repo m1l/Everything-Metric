@@ -1,5 +1,8 @@
 ## [<img src="/icons/everything-metric-128.png" height="25">](/icons/everything-metric-128.png) Everything Metric
  
+ [![GitHub issues](https://img.shields.io/github/issues/m1l/Everything-Metric?color=red)](https://github.com/m1l/Everything-Metric/issues)
+ [![GitHub repo size](https://img.shields.io/github/repo-size/m1l/Everything-Metric)](https://github.com/m1l/Everything-Metric)
+ 
 Automatically translates all sites from American and Imperial units to International System of units (SI/Metric), adding converted unit in brackets behind USC/imperial units.
 
 - Example: 10 feet (3 m)˜
