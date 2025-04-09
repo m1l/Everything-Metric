@@ -1231,7 +1231,7 @@ function InitRegex(){
 }        
 
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', async function() {
 
 	if (/docs\.google\./.test(window.location.toString()) ||
 		/drive\.google\./.test(window.location.toString()) ||
@@ -1245,32 +1245,30 @@ document.addEventListener('DOMContentLoaded', function() {
 		return;
 	}
 
-	chrome.runtime.sendMessage({
+	let response = await chrome.runtime.sendMessage({
 			message: "Is metric enabled"
-		},
-		function(response) {
-            metricIsEnabled = response.metricIsEnabled;
-			useComma = response.useComma;
-			useMM = response.useMM;
-			useRounding = response.useRounding;
-			useMO = response.useMO;
-			useGiga = response.useGiga;
-			useSpaces = response.useSpaces;
-			useKelvin = response.useKelvin;
-			useBold = response.useBold;
-			useBrackets = response.useBrackets;
-			useMetricOnly = response.useMetricOnly;
-            convertBracketed = response.convertBracketed;
-            matchIn = response.matchIn;
-            includeQuotes = response.includeQuotes;
-            includeImproperSymbols = response.includeImproperSymbols;
-			InitRegex();
-			if (response.metricIsEnabled === true) {
-                
-				let isamazon = false;
-				if (/\.amazon\./.test(window.location.toString())) isamazon = true;
-				if (/\.uk\//.test(window.location.toString())) isUK = true;
-                if (isamazon) {
+		});
+	metricIsEnabled = response.metricIsEnabled;
+	useComma = response.useComma;
+	useMM = response.useMM;
+	useRounding = response.useRounding;
+	useMO = response.useMO;
+	useGiga = response.useGiga;
+	useSpaces = response.useSpaces;
+	useKelvin = response.useKelvin;
+	useBold = response.useBold;
+	useBrackets = response.useBrackets;
+	useMetricOnly = response.useMetricOnly;
+	convertBracketed = response.convertBracketed;
+	matchIn = response.matchIn;
+	includeQuotes = response.includeQuotes;
+	includeImproperSymbols = response.includeImproperSymbols;
+	InitRegex();
+	if (response.metricIsEnabled === true) {
+		let isamazon = false;
+		if (/\.amazon\./.test(window.location.toString())) isamazon = true;
+		if (/\.uk\//.test(window.location.toString())) isUK = true;
+		if (isamazon) {
                     var div = document.getElementById("AmazonMetricHelper"); 
                     if (div===null)
                         div = document.createElement('div');
@@ -1280,14 +1278,12 @@ document.addEventListener('DOMContentLoaded', function() {
                     div.textContent = 'Converted to Metric!';    
                     document.body.appendChild(div);
                 }
-                isparsing=true;
-				walk(document.body);
-                isparsing=false;
-				if (useMO === true || isamazon === true)
-					initMO(document.body);
-			}
-		}
-	); 
+		isparsing=true;
+		walk(document.body);
+		isparsing=false;
+		if (useMO === true || isamazon === true)
+			initMO(document.body);
+	}
 }, false);
 /*
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {

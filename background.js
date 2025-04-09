@@ -6,6 +6,9 @@ var useMO;
 var useGiga;
 var useSpaces;
 var useKelvin;
+var useBold;
+var useBrackets;
+var useMetricOnly;
 var convertBracketed;
 var enableOnStart;
 var matchIn;
@@ -15,7 +18,7 @@ var includeImproperSymbols;
 function updateIcon() {
     if (metricIsEnabled===true)
 	{
-		chrome.browserAction.setIcon({
+		chrome.action.setIcon({
 			path: {
                 "16": "icons/everything-metric-16.png",
                 "19": "icons/everything-metric-19.png",
@@ -25,12 +28,12 @@ function updateIcon() {
                 "96": "icons/everything-metric-96.png",
                 "128": "icons/everything-metric-128.png"
 			}
-		});        
-		chrome.browserAction.setTitle({title: "Automatic 𝗠𝗲𝘁𝗿𝗶𝗰/SI conversion is 𝗢𝗡.\nYou can customize it in 𝗘𝘅𝘁𝗲𝗻𝘀𝗶𝗼𝗻 𝗢𝗽𝘁𝗶𝗼𝗻𝘀"});  //𝗔𝗱𝗱-𝗼𝗻 for FF
+		});
+		chrome.action.setTitle({title: "Automatic 𝗠𝗲𝘁𝗿𝗶𝗰/SI conversion is 𝗢𝗡.\nYou can customize it in 𝗘𝘅𝘁𝗲𝗻𝘀𝗶𝗼𝗻 𝗢𝗽𝘁𝗶𝗼𝗻𝘀"});  //𝗔𝗱𝗱-𝗼𝗻 for FF
 	}
     else
 	{
-		chrome.browserAction.setIcon({
+		chrome.action.setIcon({
 			path: {
                 "16": "icons/everything-metric-16-off.png",
                 "19": "icons/everything-metric-19-off.png",
@@ -40,7 +43,7 @@ function updateIcon() {
                 "96": "icons/everything-metric-96-off.png"
 			}
 		});
-		chrome.browserAction.setTitle({title: "Automatic 𝗠𝗲𝘁𝗿𝗶𝗰/SI conversion is 𝗢𝗙𝗙.\nPress 𝗔𝗟𝗧+𝗠 to convert page without turning it ON"});            
+		chrome.action.setTitle({title: "Automatic 𝗠𝗲𝘁𝗿𝗶𝗰/SI conversion is 𝗢𝗙𝗙.\nPress 𝗔𝗟𝗧+𝗠 to convert page without turning it ON"});            
 	}
 }  
 
@@ -155,7 +158,7 @@ function restore_options() {
 }
 restore_options();
 
-chrome.browserAction.onClicked.addListener(function(tab){
+chrome.action.onClicked.addListener(function(tab){
     toggleMetric();
     chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
         chrome.tabs.reload(tabs[0].id);
